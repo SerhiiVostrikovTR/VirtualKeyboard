@@ -1,4 +1,4 @@
-.ui-keyboard-button {
+.ui-keyboard-button, .backspace, .tab, .caps-lock-button, .space, .enter, .small-shift, .ctrl {
     position: absolute;
     height: 50px;
     width: 50px;
@@ -33,25 +33,30 @@
     display: none;
 }
 
-.caps-lock-button {
-    position: absolute;
-    border: 1px solid #aaa;
-    padding: 0 0.5em;
-    margin: 50px;
+.backspace {
+    width: 130px;
+}
+
+.tab {
+    width: 75px;
+}
+
+.space {
+    width: 355px;
+}
+
+.enter {
+    width: 135px;
+}
+
+.small-shift {
     width: 80px;
-    height: 30px;
-    line-height: 30px;
-    vertical-align: top;
-    font-family: Helvetica, Arial, sans-serif;
-    color: #333;
-    text-align: center;
-    border-radius: 5px;
-    -webkit-box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.5);
-    box-shadow: 1px 1px 3px 0 rgba(0, 0, 0, 0.5);
-    background: grey;
-    background-image: -webkit-linear-gradient(-90deg, white 0%, #e3e3e3 100%);
-    background-image:         linear-gradient(-90deg, white 0%, #e3e3e3 100%);
-    cursor: pointer;
-    overflow: hidden;
-    -moz-user-focus: ignore;
+}
+
+.ctrl {
+    width: 70px;
+}
+
+.caps-lock-button {
+    width: 100px;
 }
