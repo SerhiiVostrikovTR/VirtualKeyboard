@@ -60,3 +60,10 @@
 .caps-lock-button {
     width: 100px;
 }
+
+.text-area {
+    position: absolute;
+    width: 840px;
+    height: 300px;
+    left: 50px;
+}
