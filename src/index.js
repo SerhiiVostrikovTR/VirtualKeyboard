@@ -646,6 +646,7 @@ const specialButtons = [16, 8, 17, 20, 13, 46, 18, 91, 37, 38, 39, 40, 9, 32];
 //////////////////////////// MOUSE HANDLERS
 const mouseDownClickHandler = (event) => {
     const target = event.target;
+    console.log(target);
     const keycode = Number(target.id.slice(7));
     console.log(keycode);
     target.classList.add('selected-button');
@@ -678,7 +679,7 @@ const mouseDownClickHandler = (event) => {
             leftButtonAction();
         }
         else if (keycode === 39){
-            console.log('Right Arrow Button!')
+            console.log('Right Arrow Button!');
             rightButtonAction();
         }
     }
@@ -692,12 +693,12 @@ const mouseUpClickHandler = (event) => {
 
 function addTextByMouseClick(event) {
     let targ;
-    try {
-        targ = event.target.querySelector('span.' + currLang).querySelector('span:not(.hidden)');
-    }
-    catch (e) {}
+    // try {
+    //     targ = event.target.querySelector('span.' + currLang).querySelector('span:not(.hidden)');
+    // }
+    // catch (e) {}
     if (!targ) {
-        targ = event.target;
+        targ = event.target.closest('div');
     }
     // const targ = event.target.querySelector('span.' + currLang).querySelector('span:not(.hidden)');
     insertValueIntoTextArea(targ.textContent);
