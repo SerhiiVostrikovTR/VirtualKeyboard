@@ -1,17 +1,14 @@
-import keyboardElements from "./keyboardObject";
-
-function createKeyboard(keyboardElements) {
+function createTextArea() {
     const textarea = document.createElement('TEXTAREA');
     textarea.id = 'textarea';
     textarea.classList.add('text-area');
     document.body.appendChild(textarea);
+}
 
+function createKeyboard(keyboardElements) {
     const mainDiv = document.createElement('div');
     mainDiv.id = 'mainDiv';
     document.body.appendChild(mainDiv);
-
-    mainDiv.addEventListener('mousedown', mouseDownClickHandler);
-    mainDiv.addEventListener('mouseup', mouseUpClickHandler);
 
     for (let i = 0; i < keyboardElements.length; i++) {
         let newDiv = document.createElement("div");
@@ -48,4 +45,4 @@ function createKeyboard(keyboardElements) {
         mainDiv.appendChild(newDiv);
     }
 }
-export default createKeyboard();
+export {createKeyboard, createTextArea};

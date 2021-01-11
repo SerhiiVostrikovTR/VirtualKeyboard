@@ -1,15 +1,18 @@
 import keyboardElements from './keyboardObject.js';
-import createKeyboard from "./create_keyboard.js";
+import {createKeyboard, createTextArea} from "./createKeyboard.js";
 
 
-const keyboardLanguages = {eng: 'eng', ru: 'ru'}
+const keyboardLanguages = {eng: 'eng', ru: 'ru'};
 let shiftBtn = false;
 let altBtn = false;
 let capsBtn = false;
 let currLang = keyboardLanguages.eng;
-const textarea = document.getElementById('textarea');
 
-const a = createKeyboard(keyboardElements);
+createTextArea();
+createKeyboard(keyboardElements);
+
+const textarea = document.querySelector('#textarea');
+const mainDiv = document.querySelector('#mainDiv');
 
 function getCorrespondentCaseKeyboardValue(){
     if (shiftBtn){
@@ -203,11 +206,12 @@ function getTextAreaRowByCursorPosition(start, end) {
 }
 
 function getTextAreaLengthByRowsCount(textAreaRows, rowsNumber){
+    console.log(rowsNumber);
     if (textAreaRows.length === 0){
         return 0;
     }
-    else if(rowsNumber === 1){
-        return textAreaRows[0].length;
+    else if(rowsNumber === 0){
+        return 0;
     }
     return textAreaRows[rowsNumber - 1].length + getTextAreaLengthByRowsCount(textAreaRows, rowsNumber - 1);
 }
@@ -215,36 +219,47 @@ function getTextAreaLengthByRowsCount(textAreaRows, rowsNumber){
 function calculatePositionAfterDown() {
     const textAreaRows = textarea.value.split('\n');
     const cursorPosition = getTextAreaCursorPosition();
-    if (cursorPosition.row === textAreaRows.length){
+    const curRowCursorPosition = getCurrentRowCursorPosition();
+    console.log("Cur Row cursior " + curRowCursorPosition);
+    console.log("Cur row " + cursorPosition.row);
+    console.log("ALL ROWS " + textAreaRows.length);
+    if (cursorPosition.row >= textAreaRows.length){
         return cursorPosition.start;
     }
-    else if(textAreaRows[cursorPosition.row] < textAreaRows[cursorPosition.row - 1] &&
-        cursorPosition.start === getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 1)){
-        return cursorPosition.start + textAreaRows[cursorPosition.row].length + 1;
+    else if(textAreaRows[(cursorPosition.row - 1)].length > textAreaRows[cursorPosition.row].length){
+        if (curRowCursorPosition - 1 < (textAreaRows[cursorPosition.row].length)){
+
+            return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row) + curRowCursorPosition + cursorPosition.row;
+        }
+        return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row + 1) + cursorPosition.row;
     }
-    return cursorPosition.start + textAreaRows[cursorPosition.row - 1].length + 1;
+    return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row) + curRowCursorPosition + cursorPosition.row;
+}
+
+function getCurrentRowCursorPosition(){
+    const textAreaRows = textarea.value.split('\n');
+    const cursorPosition = getTextAreaCursorPosition();
+    return cursorPosition.start - getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 1) - (cursorPosition.row - 1);
 }
 
 function calculatePositionAfterUp() {
     const textAreaRows = textarea.value.split('\n');
     const cursorPosition = getTextAreaCursorPosition();
-    // console.log("cursor position " + cursorPosition.start);
-    // if (cursorPosition.row === textAreaRows.length){
-    //     return cursorPosition.start;
-    // }
-    if(textAreaRows[cursorPosition.row - 1] < textAreaRows[cursorPosition.row - 2]){
-        console.log('Im in');
-        console.log("new " + (cursorPosition.start - textAreaRows[cursorPosition.row - 2].length + textAreaRows[cursorPosition.row - 1].length - cursorPosition.row));
-        console.log(textAreaRows[cursorPosition.row - 1].length)
-        return cursorPosition.start - textAreaRows[cursorPosition.row - 2].length + textAreaRows[cursorPosition.row -1].length - cursorPosition.row;
+    const curRowCursorPosition = getCurrentRowCursorPosition();
+    if(cursorPosition.row === 1){
+        return cursorPosition.start;
     }
-    return cursorPosition.start - textAreaRows[cursorPosition.row - 1].length;
+    else if ((curRowCursorPosition + 1) > (textAreaRows[cursorPosition.row - 2].length)) {
+        return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 1)  + (cursorPosition.row - 2);
+    }
+    return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 2) + curRowCursorPosition + (cursorPosition.row - 2);
 }
 
 function downButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown') {
         const textAreaRows = textarea.value.split('\n');
         const cursorPosition = calculatePositionAfterDown();
+        console.log("DOWN " + cursorPosition);
         if (textAreaRows.length >= 2) {
             changeTextAreaCursorPosition(cursorPosition, cursorPosition);
         }
@@ -255,9 +270,7 @@ function upButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown') {
         const cursorPosition = calculatePositionAfterUp();
         console.log('After UP position ' + cursorPosition);
-        // if (cursorPosition.row > 1) {
-            changeTextAreaCursorPosition(cursorPosition, cursorPosition);
-        // }
+        changeTextAreaCursorPosition(cursorPosition, cursorPosition);
     }
 }
 
@@ -393,60 +406,11 @@ function setFocusToTextArea () {
     document.getElementById('textarea').focus();
 }
 
+mainDiv.addEventListener('mousedown', mouseDownClickHandler);
+mainDiv.addEventListener('mouseup', mouseUpClickHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener('keydown', keyDownHandler);
 document.addEventListener('keypress', keyPressHandler);
 
-
 export {backspaceButtonAction, tabButtonAction, deleteButtonAction, capsLockButtonClickAction, enterButtonAction,
 commonShiftHandler, upButtonAction, commonAltHandler, leftButtonAction, downButtonAction, rightButtonAction, spaceButtonAction}
-
-
-
-// const textarea = document.createElement('TEXTAREA');
-// textarea.id = 'textarea';
-// textarea.classList.add('text-area');
-// document.body.appendChild(textarea);
-//
-// const mainDiv = document.createElement('div');
-// mainDiv.id = 'mainDiv';
-// document.body.appendChild(mainDiv);
-//
-// mainDiv.addEventListener('mousedown', mouseDownClickHandler);
-// mainDiv.addEventListener('mouseup', mouseUpClickHandler);
-//
-// for (let i=0; i<keyboardElements.length; i++) {
-//     let newDiv = document.createElement("div");
-//     newDiv.classList.add(keyboardElements[i]['style']);
-//     newDiv.id = 'div_id_' + keyboardElements[i]['keycode'];
-//     newDiv.style.left = `${keyboardElements[i]['left']}px`;
-//     newDiv.style.top = `${keyboardElements[i]['top']}px`;
-//
-//     if (keyboardElements[i]['values']){
-//         for (const property in keyboardElements[i]['values']){
-//             let newSpan = document.createElement('span');
-//             newSpan.className = property;
-//             if (property !== 'eng'){
-//                 newSpan.classList.add('hidden');
-//             }
-//             for (const prop in keyboardElements[i]['values'][property]){
-//                 let elemSpan = document.createElement('span');
-//                 elemSpan.className = prop;
-//                 if (prop !== 'default') {
-//                     elemSpan.classList.add('hidden');
-//                 }
-//                 let newSpanNode = document.createTextNode(keyboardElements[i]['values'][property][prop]);
-//                 elemSpan.appendChild(newSpanNode);
-//                 newSpan.appendChild(elemSpan);
-//             }
-//             newDiv.appendChild(newSpan);
-//         }
-//     }
-//     else {
-//         let spanCaseDown = document.createElement('span');
-//         let newSpanNode = document.createTextNode(keyboardElements[i]['name']);
-//         spanCaseDown.appendChild(newSpanNode);
-//         newDiv.appendChild(spanCaseDown);
-//     }
-//     mainDiv.appendChild(newDiv);
-// }
