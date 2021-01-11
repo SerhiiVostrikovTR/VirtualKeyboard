@@ -1,18 +1,16 @@
-function createTextArea() {
-    const textarea = document.createElement('TEXTAREA');
-    textarea.id = 'textarea';
-    textarea.classList.add('text-area');
-    document.body.appendChild(textarea);
-}
+const mainDivId = 'mainDiv';
 
 function createKeyboard(keyboardElements) {
     const mainDiv = document.createElement('div');
-    mainDiv.id = 'mainDiv';
+    mainDiv.id = mainDivId;
     document.body.appendChild(mainDiv);
 
     for (let i = 0; i < keyboardElements.length; i++) {
         let newDiv = document.createElement("div");
         newDiv.classList.add(keyboardElements[i]['style']);
+        if (keyboardElements[i]['additionalStyle']){
+            newDiv.classList.add(keyboardElements[i]['additionalStyle']);
+        }
         newDiv.id = 'div_id_' + keyboardElements[i]['keycode'];
         newDiv.style.left = `${keyboardElements[i]['left']}px`;
         newDiv.style.top = `${keyboardElements[i]['top']}px`;
@@ -45,4 +43,4 @@ function createKeyboard(keyboardElements) {
         mainDiv.appendChild(newDiv);
     }
 }
-export {createKeyboard, createTextArea};
+export {createKeyboard, mainDivId};

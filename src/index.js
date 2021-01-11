@@ -1,5 +1,7 @@
 import keyboardElements from './keyboardObject.js';
-import {createKeyboard, createTextArea} from "./createKeyboard.js";
+import {createKeyboard, mainDivId} from "./createKeyboard.js";
+import {createTextArea, textAreaId, changeTextAreaCursorPosition, insertValueIntoTextArea, getTextAreaCommonCursorPosition,
+    calculateTextAreaCursorPositionAfterDown, calculateTextAreaCursorPositionAfterUp, createCommentText} from "./textAreaObject.js";
 
 
 const keyboardLanguages = {eng: 'eng', ru: 'ru'};
@@ -11,8 +13,10 @@ let currLang = keyboardLanguages.eng;
 createTextArea();
 createKeyboard(keyboardElements);
 
-const textarea = document.querySelector('#textarea');
-const mainDiv = document.querySelector('#mainDiv');
+const textarea = document.querySelector(textAreaId);
+const mainDiv = document.getElementById(mainDivId);
+
+createCommentText(mainDiv);
 
 function getCorrespondentCaseKeyboardValue(){
     if (shiftBtn){
@@ -58,9 +62,11 @@ function mouseUpClickHandler(event) {
 }
 
 function keyUpHandler(event) {
-    doActionOnButton(event.which, event);
-    getKeyboardElementByKeyCode(event.which).classList.remove('selected-button');
-    setFocusToTextArea();
+    if (event.which !== 20){
+        doActionOnButton(event.which, event);
+        removeSelectedButton(event);
+        setFocusToTextArea();
+    }
 }
 
 function doActionOnButton(keycode, event){
@@ -71,14 +77,13 @@ function doActionOnButton(keycode, event){
 }
 
 function keyDownHandler(event) {
-    event.preventDefault();
-    globalPressActionHandler(event, event.which, getKeyboardElementByKeyCode(event.which));
-    setSelectedButton(event);
-}
-
-function keyPressHandler(event) {
-    if (event.which === 20){
-        capsLockButtonClickAction();
+    if (event.which !== 20){
+        event.preventDefault();
+        globalPressActionHandler(event, event.which, getKeyboardElementByKeyCode(event.which));
+        setSelectedButton(event);
+    }
+    else {
+        capsLockButtonClickAction(event);
     }
 }
 
@@ -88,6 +93,10 @@ function getKeyboardElementByKeyCode(keycode){
 
 function setSelectedButton(event){
     getKeyboardElementByKeyCode(event.which).classList.add('selected-button');
+}
+
+function removeSelectedButton(event) {
+    getKeyboardElementByKeyCode(event.which).classList.remove('selected-button');
 }
 
 function keyBoardLanguageSwitcher(){
@@ -114,7 +123,7 @@ function switchToRuKeyboard() {
 function deleteButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown')
     {
-        const cursorPosition = getTextAreaCursorPosition();
+        const cursorPosition = getTextAreaCommonCursorPosition();
         let textAreaToArr = textarea.value.split('');
         if (cursorPosition.start === cursorPosition.end)
         {
@@ -131,7 +140,7 @@ function deleteButtonAction(event) {
 function backspaceButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown')
     {
-        const cursorPosition = getTextAreaCursorPosition();
+        const cursorPosition = getTextAreaCommonCursorPosition();
         let textAreaToArr = textarea.value.split('');
         if (cursorPosition.start === cursorPosition.end)
         {
@@ -168,7 +177,7 @@ function spaceButtonAction(event) {
 function leftButtonAction(event){
     if (event.type === 'mousedown' || event.type === 'keydown')
     {
-        const cursorPosition = getTextAreaCursorPosition();
+        const cursorPosition = getTextAreaCommonCursorPosition();
         if (cursorPosition.start === 0){
             return;
         }
@@ -179,7 +188,7 @@ function leftButtonAction(event){
 function rightButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown')
     {
-        const cursorPosition = getTextAreaCursorPosition();
+        const cursorPosition = getTextAreaCommonCursorPosition();
         if (cursorPosition.start>textarea.value.length){
             return;
         }
@@ -187,73 +196,10 @@ function rightButtonAction(event) {
     }
 }
 
-function getTextAreaRowByCursorPosition(start, end) {
-    const rowNumber = textarea.value.split('\n').map(elem => elem.length);
-    let rowSum = 0;
-    return rowNumber.reduce(function (acc, row) {
-        rowSum += row;
-        if (start === end){
-            if ((start+1) <= (rowSum+acc)){
-                return acc;
-            }}
-        else {
-            if ((end+1) <= (rowSum+acc)){
-                return acc;
-            }
-        }
-        return acc+1;
-    },1);
-}
-
-function getTextAreaLengthByRowsCount(textAreaRows, rowsNumber){
-    console.log(rowsNumber);
-    if (textAreaRows.length === 0){
-        return 0;
-    }
-    else if(rowsNumber === 0){
-        return 0;
-    }
-    return textAreaRows[rowsNumber - 1].length + getTextAreaLengthByRowsCount(textAreaRows, rowsNumber - 1);
-}
-
-function calculatePositionAfterDown() {
-    const textAreaRows = textarea.value.split('\n');
-    const cursorPosition = getTextAreaCursorPosition();
-    const curRowCursorPosition = getCurrentRowCursorPosition();
-    if (cursorPosition.row >= textAreaRows.length){
-        return cursorPosition.start;
-    }
-    else if(textAreaRows[(cursorPosition.row - 1)].length > textAreaRows[cursorPosition.row].length) {
-        if (curRowCursorPosition > (textAreaRows[cursorPosition.row].length)) {
-            return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row + 1) + cursorPosition.row;
-        }
-    }
-    return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row) + curRowCursorPosition + cursorPosition.row;
-}
-
-function getCurrentRowCursorPosition(){
-    const textAreaRows = textarea.value.split('\n');
-    const cursorPosition = getTextAreaCursorPosition();
-    return cursorPosition.start - getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 1) - (cursorPosition.row - 1);
-}
-
-function calculatePositionAfterUp() {
-    const textAreaRows = textarea.value.split('\n');
-    const cursorPosition = getTextAreaCursorPosition();
-    const curRowCursorPosition = getCurrentRowCursorPosition();
-    if(cursorPosition.row === 1){
-        return cursorPosition.start;
-    }
-    else if ((curRowCursorPosition + 1) > (textAreaRows[cursorPosition.row - 2].length)) {
-        return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 1)  + (cursorPosition.row - 2);
-    }
-    return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row - 2) + curRowCursorPosition + (cursorPosition.row - 2);
-}
-
 function downButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown') {
         const textAreaRows = textarea.value.split('\n');
-        const cursorPosition = calculatePositionAfterDown();
+        const cursorPosition = calculateTextAreaCursorPositionAfterDown();
         console.log("DOWN " + cursorPosition);
         if (textAreaRows.length >= 2) {
             changeTextAreaCursorPosition(cursorPosition, cursorPosition);
@@ -263,7 +209,7 @@ function downButtonAction(event) {
 
 function upButtonAction(event) {
     if (event.type === 'mousedown' || event.type === 'keydown') {
-        const cursorPosition = calculatePositionAfterUp();
+        const cursorPosition = calculateTextAreaCursorPositionAfterUp();
         console.log('After UP position ' + cursorPosition);
         changeTextAreaCursorPosition(cursorPosition, cursorPosition);
     }
@@ -324,9 +270,11 @@ function enterButtonAction(event) {
     }
 }
 
-function capsLockButtonClickAction() {
+function capsLockButtonClickAction(event) {
     if (!capsBtn) {
         capsBtn = true;
+        console.log(event);
+        setSelectedButton(event);
         if (shiftBtn) {
             shiftOn();
         }
@@ -337,6 +285,7 @@ function capsLockButtonClickAction() {
     else {
         capsBtn = false;
         defaultOn();
+        removeSelectedButton(event);
     }
 }
 
@@ -358,45 +307,6 @@ function defaultOn(){
     document.querySelectorAll('span.caseUp').forEach(elem => elem.classList.add('hidden'));
 }
 
-function getTextAreaCursorPosition () {
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const row = getTextAreaRowByCursorPosition(start, end);
-    return {start, end, row};
-}
-
-function changeTextAreaCursorPosition(start, end){
-    textarea.selectionStart = start;
-    textarea.selectionEnd = end;
-}
-
-function insertValueIntoTextArea(value) {
-    const cursorPosition = getTextAreaCursorPosition();
-    if (cursorPosition.start === cursorPosition.end)
-    {
-        if (cursorPosition.start !== 0)
-        {
-            textarea.value = textarea.value.slice(0, cursorPosition.start - 1) +
-                textarea.value.slice(cursorPosition.start - 1, cursorPosition.start) +
-                value +
-                textarea.value.slice(cursorPosition.start);
-        }
-        else {
-            textarea.value = value + textarea.value.slice(cursorPosition.start);
-        }
-    }
-    else {
-        if (cursorPosition.start !== 0)
-        {
-            textarea.value = textarea.value.slice(0, cursorPosition.start) + value + textarea.value.slice(cursorPosition.end);
-        }
-        else {
-            textarea.value = value + textarea.value.slice(cursorPosition.end);
-        }
-    }
-    changeTextAreaCursorPosition(cursorPosition.start + value.length, cursorPosition.start + value.length);
-}
-
 function setFocusToTextArea () {
     document.getElementById('textarea').focus();
 }
@@ -405,7 +315,7 @@ mainDiv.addEventListener('mousedown', mouseDownClickHandler);
 mainDiv.addEventListener('mouseup', mouseUpClickHandler);
 document.addEventListener('keyup', keyUpHandler);
 document.addEventListener('keydown', keyDownHandler);
-document.addEventListener('keypress', keyPressHandler);
 
 export {backspaceButtonAction, tabButtonAction, deleteButtonAction, capsLockButtonClickAction, enterButtonAction,
-commonShiftHandler, upButtonAction, commonAltHandler, leftButtonAction, downButtonAction, rightButtonAction, spaceButtonAction}
+commonShiftHandler, upButtonAction, commonAltHandler, leftButtonAction, downButtonAction, rightButtonAction,
+    spaceButtonAction, textarea}

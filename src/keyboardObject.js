@@ -213,7 +213,8 @@ const keyboardElements = [
         keycode: 187},
     {
         name: 'Backspace',
-        style: 'backspace',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'backspace',
         left: 715,
         top: 300,
         keycode: 8,
@@ -222,7 +223,8 @@ const keyboardElements = [
     {
         name: 'Tab',
         value: '\t',
-        style: 'tab',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'tab',
         left: 0,
         top: 355,
         keycode: 9,
@@ -447,11 +449,12 @@ const keyboardElements = [
     },
     {
         name: 'Caps Lock',
-        style: 'caps-lock-button',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'caps-lock-button',
         left: 0,
         top: 410,
         keycode: 20,
-        action: () => capsLockButtonClickAction()},
+        action: (event) => capsLockButtonClickAction(event)},
     {
         values: {
             eng: {
@@ -629,17 +632,9 @@ const keyboardElements = [
         top: 410,
         keycode: 222},
     {
-        // values: {
-        //     eng: {
-        //         default: '\n',
-        //         caseUp: '\n',
-        //     },
-        //     ru: {
-        //         default: '\n',
-        //         caseUp: '\n',
-        //     }},
         name: 'Enter',
-        style: 'enter',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'enter',
         left: 710,
         top: 410,
         keycode: 13,
@@ -647,7 +642,8 @@ const keyboardElements = [
     },
     {
         name: 'Shift',
-        style: 'caps-lock-button',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'caps-lock-button',
         left: 0,
         top: 465,
         keycode: 16,
@@ -838,7 +834,8 @@ const keyboardElements = [
         action: (event) => upButtonAction(event) },
     {
         name: 'Shift',
-        style: 'small-shift',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'small-shift',
         left: 765,
         top: 465,
         keycode: 16,
@@ -847,7 +844,8 @@ const keyboardElements = [
 
     {
         name: 'Ctrl',
-        style: 'ctrl',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'ctrl',
         left: 0,
         top: 520,
         keycode: 17,
@@ -870,7 +868,8 @@ const keyboardElements = [
     },
     {
         name: ' ',
-        style: 'space',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'space',
         left: 185,
         top: 520,
         keycode: 32,
@@ -910,7 +909,8 @@ const keyboardElements = [
     },
     {
         name: 'Right',
-        style: 'small-shift',
+        style: 'ui-keyboard-button',
+        additionalStyle: 'small-shift',
         left: 765,
         top: 520,
         keycode: 39,
