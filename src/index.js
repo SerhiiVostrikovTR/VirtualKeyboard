@@ -220,18 +220,13 @@ function calculatePositionAfterDown() {
     const textAreaRows = textarea.value.split('\n');
     const cursorPosition = getTextAreaCursorPosition();
     const curRowCursorPosition = getCurrentRowCursorPosition();
-    console.log("Cur Row cursior " + curRowCursorPosition);
-    console.log("Cur row " + cursorPosition.row);
-    console.log("ALL ROWS " + textAreaRows.length);
     if (cursorPosition.row >= textAreaRows.length){
         return cursorPosition.start;
     }
-    else if(textAreaRows[(cursorPosition.row - 1)].length > textAreaRows[cursorPosition.row].length){
-        if (curRowCursorPosition - 1 < (textAreaRows[cursorPosition.row].length)){
-
-            return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row) + curRowCursorPosition + cursorPosition.row;
+    else if(textAreaRows[(cursorPosition.row - 1)].length > textAreaRows[cursorPosition.row].length) {
+        if (curRowCursorPosition > (textAreaRows[cursorPosition.row].length)) {
+            return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row + 1) + cursorPosition.row;
         }
-        return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row + 1) + cursorPosition.row;
     }
     return getTextAreaLengthByRowsCount(textAreaRows, cursorPosition.row) + curRowCursorPosition + cursorPosition.row;
 }
